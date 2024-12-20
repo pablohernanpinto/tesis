@@ -1,0 +1,81 @@
+mira tengo esta base de datos estoy trabajando con ipynb
+
+te lo voy a mandar bloque por bloque y quiero una sugerencia para poder graficar ambas clases y que sea mas visual su forma para poder ver las diferencias entre la clase 1 y 0 
+
+1.
+
+s_aureus = pd.read_csv('s_aureus_driams_a_bin3_2000_20000Da.csv')
+s_aureus = s_aureus.fillna(0)
+s_aureus
+
+2.
+
+s_aureus_oxacillin = s_aureus.drop(columns=['code','species', 'Clindamycin', 'Ceftriaxone', 'Ciprofloxacin', 'Fusidic acid'])
+s_aureus_oxacillin.dropna(axis=0, how="any", inplace=True)
+
+3.
+
+s_aureus_ceftriaxone = s_aureus.drop(columns=['Oxacillin', 'Clindamycin', 'Ceftriaxone', 'Fusidic acid'])
+#ceftriaxone.dropna(axis=0, how="any", inplace=True)
+
+4.
+
+X = s_aureus_oxacillin.iloc[:, 0:6000].values  # variables independientes (espectros de masa)
+y = s_aureus_oxacillin.iloc[:, 6000].values    # variable dependientes (resistencia a ciprofloxacin)
+X = np.asarray(X).astype(np.float32)
+y = np.asarray(y).astype(np.float32) 
+
+5.
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, stratify=y)
+s_aureus_ceftriaxone.dropna(axis=0, how="any", inplace=True)
+
+6.
+
+from sklearn.decomposition import PCA 
+# Reducir dimensiones con PCA
+pca = PCA(n_components=2)
+X_train_pca = pca.fit_transform(X_train)
+
+ 
+s_aureus_ceftriaxone.shape
+
+7.
+# Graficar los datos reducidos
+plt.figure(figsize=(30, 10))
+#plt.plot(X_train_pca[:, 1],X_train_pca[:, 0],  c='blue', alpha=0.7, label='Datos PCA')
+
+scatter = plt.scatter(X_train_pca[:, 1],X_train_pca[:, 0], c=y_train, cmap='viridis', alpha=0.5)
+plt.colorbar(scatter, label='Clase (y_train)')
+plt.title('Visualización PCA de X_train')
+plt.xlabel('Componente Principal 1')
+plt.ylabel('Componente Principal 2')
+# Establecer límites para hacer zoom
+rangoX = 200000
+rangoY = 500000
+plt.xlim(-rangoX, rangoX)  # Cambia los valores para enfocar
+plt.ylim(-rangoY, rangoY)    # Cambia los valores para enfocar
+plt.grid(True)
+
+8.
+
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+
+9.
+
+# Graficar los datos reducidos
+plt.figure(figsize=(30, 10))
+#plt.plot(X_train_pca[:, 1],X_train_pca[:, 0],  c='blue', alpha=0.7, label='Datos PCA')
+
+scatter = plt.scatter(X_resampled[:, 1],X_resampled[:, 0], c=y_resampled, cmap='viridis', alpha=0.5)
+plt.colorbar(scatter, label='Clase (y_train)')
+plt.title('Visualización PCA de X_train')
+plt.xlabel('Componente Principal 1')
+plt.ylabel('Componente Principal 2')
+# Establecer límites para hacer zoom
+rangoX = 10000
+rangoY = 1000
+plt.xlim(0, rangoX)  # Cambia los valores para enfocar
+plt.ylim(0, rangoX)    # Cambia los valores para enfocar
+plt.grid(True)
