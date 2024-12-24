@@ -1,0 +1,4 @@
+Elección del Método
+Datos pequeños: SMOTE con Autoencoders o VAEs.
+Datos complejos: TGAN o CTGAN.
+Alta precisión: Diffusion Models o Copulas.
